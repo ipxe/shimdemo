@@ -1,0 +1,6 @@
+secboot.*
+vendor.*
+*.der
+*.siglist
+*.db
+*.efi
