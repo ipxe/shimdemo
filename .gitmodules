@@ -1,3 +1,6 @@
 [submodule "ipxe"]
 	path = ipxe
 	url = git://git.ipxe.org/ipxe.git
+[submodule "shim"]
+	path = shim
+	url = https://github.com/ipxe/shim.git
