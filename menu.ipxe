@@ -1,0 +1,43 @@
+#!ipxe
+
+set fedora http://dl.fedoraproject.org/pub/fedora/linux/releases/27/Workstation/x86_64/os
+set demo http://boot.ipxe.org/demo
+
+:menu
+menu shim transparent loader demo
+item minimal       Fedora kernel and minimal initrd
+item fedora        Fedora Workstation installer
+item shell_secboot UEFI shell (signed with Secure Boot CA key)
+item shell_vendor  UEFI shell (signed with Vendor CA key)
+item shell         iPXE internal shell
+item exit          Exit
+choose option && goto ${option}
+
+:minimal
+kernel ${fedora}/images/pxeboot/vmlinuz initrd=initrd.img bootfile=${demo}
+initrd ${demo}/initrd.img
+boot
+
+:fedora
+kernel ${fedora}/images/pxeboot/vmlinuz initrd=initrd.img repo=${fedora}
+initrd ${fedora}/images/pxeboot/initrd.img
+boot
+
+:shell_secboot
+chain Shell.secboot.efi ||
+imgfree
+prompt Press any key to return to menu
+goto menu
+
+:shell_vendor
+chain Shell.vendor.efi ||
+imgfree
+prompt Press any key to return to menu
+goto menu
+
+:shell
+shell ||
+goto menu
+
+:exit
+exit
