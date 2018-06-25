@@ -8,6 +8,8 @@ an operating system.
 Quick start
 -----------
 
+ 1. install gnu-efi (ie. # apt install gnu-efi)
+
  1. git submodule update --init
 
  2. make
