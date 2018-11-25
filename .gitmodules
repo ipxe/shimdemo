@@ -8,3 +8,6 @@
 	path = edk2
 	url = https://github.com/tianocore/edk2.git
 	shallow = true
+[submodule "ProxyLoaderPkg"]
+	path = ProxyLoaderPkg
+	url = https://github.com/ipxe/ProxyLoaderPkg.git
