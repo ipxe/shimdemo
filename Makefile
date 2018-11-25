@@ -29,14 +29,40 @@ all : secboot.key secboot.crt secboot.db vendor.key vendor.crt \
 	sbvarsign --key $*.key --cert $*.crt --output $@ sb $<
 
 #
+# Build ProxyLoaderPkg and sign with Secure Boot key
+#
+
+BASETOOLS_CFLAGS = -Wno-stringop-truncation -Wno-stringop-overflow
+
+edk2/BaseTools/Source/C/bin/GenFw : edk2/BaseTools/Source/C/Makefile
+	pushd edk2 && \
+	. ./edksetup.sh && \
+	make -C BaseTools/Source/C BUILD_CC="$(CC) $(BASETOOLS_CFLAGS)" && \
+	popd
+
+edk2/Build/ProxyLoader/DEBUG_GCC5/X64/ProxyLoader.efi : \
+					edk2/BaseTools/Source/C/bin/GenFw
+	ln -sf ../ProxyLoaderPkg edk2/
+	pushd edk2 && \
+	. ./edksetup.sh && \
+	build -a X64 -t GCC5 -p ProxyLoaderPkg/ProxyLoaderPkg.dsc && \
+	popd
+	rm edk2/ProxyLoaderPkg
+
+ProxyLoader.efi : edk2/Build/ProxyLoader/DEBUG_GCC5/X64/ProxyLoader.efi \
+		  secboot.key secboot.crt
+	sbsign --key secboot.key --cert secboot.crt --output $@ $<
+
+#
 # Build shim and sign with Secure Boot key
 #
 
 multi.der : vendor.der fedora.der
 	cat $^ > $@
 
-shim/shimx64.efi : multi.der
+shim/shimx64.efi : multi.der ProxyLoader.efi
 	$(MAKE) -C shim VENDOR_CERT_FILE=$(CURDIR)/multi.der \
+			PROXY_LOADER_FILE=$(CURDIR)/ProxyLoader.efi \
 			DEFAULT_LOADER=ipxe.efi
 
 shim.efi : shim/shimx64.efi secboot.key secboot.crt
