@@ -1,0 +1,9 @@
+[req]
+distinguished_name	= dn
+
+[dn]
+CN			= None
+
+[extensions_ca]
+basicConstraints	= critical,CA:true
+keyUsage		= critical,keyCertSign,cRLSign

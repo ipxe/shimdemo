@@ -13,7 +13,8 @@ all : secboot.key secboot.crt secboot.db vendor.key vendor.crt \
 .PRECIOUS : %.key
 
 %.crt : %.key
-	openssl req -x509 -key $< -subj '/CN=$(cn_$*)' -days 3000 -out $@
+	openssl req -x509 -key $< -subj '/CN=$(cn_$*)' -days 3000 \
+		-config openssl.cnf -extensions extensions_ca -out $@
 
 %.der : %.crt
 	openssl x509 -in $< -outform DER -out $@
